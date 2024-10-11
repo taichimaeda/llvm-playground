@@ -13,5 +13,5 @@ cmake --build build
 
 ```console
 cmake -S . -B build
-ctest --test-dir build
+cmake --build build && ctest --test-dir build --verbose
 ```

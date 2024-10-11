@@ -2,12 +2,15 @@
 # https://llvm.org/docs/CMake.html#embedding-llvm-in-your-project
 
 cmake_minimum_required(VERSION 3.20.0)
-project(SimpleProject)
+project(Kaleidoscope)
 
-# These environment variables must be set after the project() command
+# Set environment variables after the project() command
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Enable debug build for ctest
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(LLVM REQUIRED CONFIG)
 
@@ -33,10 +36,15 @@ llvm_map_components_to_libnames(llvm_libs support core irreader)
 # Link against LLVM libraries
 target_link_libraries(main ${llvm_libs})
 
-# Enable testing with CTest
-enable_testing()
+# Enable warnings for all targets
+target_compile_options(main PUBLIC -Wall -Wextra -Wpedantic -Werror)
 
-add_executable(test_lexer tests/test_lexer.cpp ../lexer.cpp)
-target_link_libraries(test_lexer ${llvm_libs})
+# Add the GoogleTest library
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+FetchContent_MakeAvailable(googletest)
 
-add_test(NAME run_test COMMAND test_lexer)
+add_subdirectory(tests)

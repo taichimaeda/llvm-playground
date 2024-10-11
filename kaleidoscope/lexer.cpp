@@ -1,5 +1,10 @@
 #include "lexer.hpp"
 
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <tuple>
+
 Tokenizer::Tokenizer(std::string input) : rest{input} {
     std::tie(current, rest) = tokenize(rest);
 }
@@ -43,4 +48,13 @@ std::pair<Token, std::string_view> Tokenizer::tokenize(std::string_view input) {
         }
         return {Ident{std::string{str}}, input.substr(pos)};
     }
+
+    if (isdigit(input[0])) {
+        auto it = std::find_if_not(input.begin(), input.end(), isdigit);
+        auto pos = static_cast<size_t>(it - input.begin());
+        auto str = input.substr(0, pos);
+        return {Number{std::stod(std::string{str})}, input.substr(pos)};
+    }
+
+    throw std::runtime_error{"unexpected character"};
 }
